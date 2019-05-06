@@ -1,0 +1,20 @@
+plugins {
+    id 'java'
+}
+
+group 'com.danielvladco'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 11
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile group: 'com.google.code.gson', name: 'gson', version: '2.8.5'
+    compile group: 'io.undertow', name: 'undertow-core', version: '2.0.20.Final'
+    compile group: 'com.squareup.okhttp3', name: 'okhttp', version: '3.14.1'
+
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
