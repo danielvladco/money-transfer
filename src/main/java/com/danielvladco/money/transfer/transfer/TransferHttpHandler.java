@@ -11,9 +11,6 @@ import io.undertow.Handlers;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.RoutingHandler;
-import io.undertow.server.handlers.ExceptionHandler;
-
-import java.util.Map;
 
 public class TransferHttpHandler {
 
@@ -38,17 +35,10 @@ public class TransferHttpHandler {
 
 	private HttpHandler exceptionHandlers(HttpHandler next) {
 		return Handlers.exceptionHandler(next)
-				.addExceptionHandler(InsufficientFundsException.class, handleException("insufficient_funds"))
-				.addExceptionHandler(MismatchingCurrenciesException.class, handleException("mismatching_currencies"))
-				.addExceptionHandler(AccountNotFoundException.class, handleException("account_not_found"))
-				.addExceptionHandler(TransactionInvalidException.class, handleException("transaction_invalid"))
-				.addExceptionHandler(TransferToOneselfException.class, handleException("transfer_to_oneself"));
-	}
-
-	private HttpHandler handleException(String code) {
-		return exchange -> HttpUtils.sendJson(exchange, 400, Map.of(
-				"code", code,
-				"message", exchange.getAttachment(ExceptionHandler.THROWABLE).getMessage()
-		));
+				.addExceptionHandler(InsufficientFundsException.class, HttpUtils.sendException("insufficient_funds"))
+				.addExceptionHandler(MismatchingCurrenciesException.class, HttpUtils.sendException("mismatching_currencies"))
+				.addExceptionHandler(AccountNotFoundException.class, HttpUtils.sendException("account_not_found"))
+				.addExceptionHandler(TransactionInvalidException.class, HttpUtils.sendException("transaction_invalid"))
+				.addExceptionHandler(TransferToOneselfException.class, HttpUtils.sendException("transfer_to_oneself"));
 	}
 }

@@ -7,9 +7,6 @@ import io.undertow.Handlers;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.RoutingHandler;
-import io.undertow.server.handlers.ExceptionHandler;
-
-import java.util.Map;
 
 public class TransactionHttpHandler {
 
@@ -39,14 +36,7 @@ public class TransactionHttpHandler {
 
 	private HttpHandler exceptionHandlers(HttpHandler next) {
 		return Handlers.exceptionHandler(next)
-				.addExceptionHandler(TransactionInvalidException.class, handleException("transaction_invalid"))
-				.addExceptionHandler(TransactionNotFoundException.class, handleException("transaction_not_found"));
-	}
-
-	private HttpHandler handleException(String code) {
-		return exchange -> HttpUtils.sendJson(exchange, 400, Map.of(
-				"code", code,
-				"message", exchange.getAttachment(ExceptionHandler.THROWABLE).getMessage()
-		));
+				.addExceptionHandler(TransactionInvalidException.class, HttpUtils.sendException("transaction_invalid"))
+				.addExceptionHandler(TransactionNotFoundException.class, HttpUtils.sendException("transaction_not_found"));
 	}
 }

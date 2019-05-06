@@ -9,9 +9,6 @@ import io.undertow.Handlers;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.RoutingHandler;
-import io.undertow.server.handlers.ExceptionHandler;
-
-import java.util.Map;
 
 public class AccountHttpHandler {
 
@@ -66,15 +63,8 @@ public class AccountHttpHandler {
 
 	private HttpHandler exceptionHandlers(HttpHandler next) {
 		return Handlers.exceptionHandler(next)
-				.addExceptionHandler(AccountInvalidException.class, handleException("account_invalid"))
-				.addExceptionHandler(AccountNotFoundException.class, handleException("account_not_found"));
-	}
-
-	private HttpHandler handleException(String code) {
-		return exchange -> HttpUtils.sendJson(exchange, 400, Map.of(
-				"code", code,
-				"message", exchange.getAttachment(ExceptionHandler.THROWABLE).getMessage()
-		));
+				.addExceptionHandler(AccountInvalidException.class, HttpUtils.sendException("account_invalid"))
+				.addExceptionHandler(AccountNotFoundException.class, HttpUtils.sendException("account_not_found"));
 	}
 }
 
