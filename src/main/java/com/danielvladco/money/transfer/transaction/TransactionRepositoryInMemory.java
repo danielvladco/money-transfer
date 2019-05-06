@@ -22,6 +22,9 @@ public class TransactionRepositoryInMemory implements TransactionRepository {
 
 	@Override
 	public Transaction get(String transactionId) throws TransactionNotFoundException {
+		if (transactionId == null) {
+			throw new TransactionNotFoundException();
+		}
 		if (!transactions.containsKey(transactionId)) {
 			throw new TransactionNotFoundException();
 		}
@@ -58,10 +61,14 @@ public class TransactionRepositoryInMemory implements TransactionRepository {
 
 	@Override
 	public List<Transaction> getByAccountId(String accountId) {
+		if (accountId == null) {
+			accountId = "";
+		}
+		final String accountId2 = accountId;
 		return transactions.values()
 				.stream()
 				.parallel()
-				.filter(t -> t.getAccountId().equals(accountId))
+				.filter(t -> t.getAccountId().equals(accountId2))
 				.collect(Collectors.toList());
 	}
 }

@@ -9,6 +9,7 @@ import com.danielvladco.money.transfer.transaction.exceptions.TransactionInvalid
 import com.danielvladco.money.transfer.transaction.models.Transaction;
 import com.danielvladco.money.transfer.transfer.exceptions.InsufficientFundsException;
 import com.danielvladco.money.transfer.transfer.exceptions.MismatchingCurrenciesException;
+import com.danielvladco.money.transfer.transfer.exceptions.TransferToOneselfException;
 import com.danielvladco.money.transfer.transfer.models.TransferMoneyRequest;
 
 import java.util.UUID;
@@ -25,7 +26,7 @@ public class TransferServiceImpl implements TransferService {
 	}
 
 	@Override
-	public void transferMoney(TransferMoneyRequest request) throws AccountNotFoundException, MismatchingCurrenciesException, TransactionInvalidException, InsufficientFundsException {
+	public void transferMoney(TransferMoneyRequest request) throws AccountNotFoundException, MismatchingCurrenciesException, TransactionInvalidException, InsufficientFundsException, TransferToOneselfException {
 		Account sourceAccount;
 		Account targetAccount;
 		try {
@@ -38,6 +39,10 @@ public class TransferServiceImpl implements TransferService {
 			targetAccount = accountRepository.get(request.getTargetAccountId());
 		} catch (AccountNotFoundException e) {
 			throw new AccountNotFoundException("target account not found, id: " + request.getTargetAccountId());
+		}
+
+		if (sourceAccount.getId().equals(targetAccount.getId())) {
+			throw new TransferToOneselfException();
 		}
 
 		// check if source account has the same currency as target account

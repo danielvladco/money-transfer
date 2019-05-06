@@ -11,6 +11,7 @@ import com.danielvladco.platform.common.HttpUtils;
 import io.undertow.Handlers;
 import io.undertow.Undertow;
 import io.undertow.server.HttpServerExchange;
+import io.undertow.server.RoutingHandler;
 import io.undertow.server.handlers.ExceptionHandler;
 
 public class Main {
@@ -30,18 +31,23 @@ public class Main {
 		final var accountHttpHandler = new AccountHttpHandler(accountRepository, accountService, transactionRepository);
 		final var transferHttpHandler = new TransferHttpHandler(transferService);
 
-		final var pathHandler = Handlers.path(Main::notFoundHandler);
-		pathHandler.addPrefixPath("/v1", accountHttpHandler.makeHandler());
-		pathHandler.addPrefixPath("/v1", transactionHttpHandler.makeHandler());
-		pathHandler.addPrefixPath("/v1", transferHttpHandler.makeHandler());
+		var baseRouter = new RoutingHandler();
+		baseRouter.addAll(accountHttpHandler.makeHandler());
+		baseRouter.addAll(transactionHttpHandler.makeHandler());
+		baseRouter.addAll(transferHttpHandler.makeHandler());
+		baseRouter.setFallbackHandler(Main::notFoundHandler);
+		baseRouter.setInvalidMethodHandler(Main::methodNotAllowedHandler);
 
 		// creates http handler and dispatches work in separate threads
-		var handler = HttpUtils.threadDispatcherHandler(pathHandler);
+		var handler = HttpUtils.threadDispatcherHandler(baseRouter);
 
+		// add version prefix to handlers
+		handler = Handlers.path().addPrefixPath("/v1", handler);
 		// wrap http handlers with generic exception handler
 		handler = Handlers.exceptionHandler(handler)
-				.addExceptionHandler(Throwable.class, Main::exceptionHandler)
-				.addExceptionHandler(IllegalArgumentException.class, exc -> HttpUtils.sendJson(exc, 400, exc.getAttachment(ExceptionHandler.THROWABLE)));
+				.addExceptionHandler(IllegalArgumentException.class, exc ->
+						HttpUtils.sendJson(exc, 400, exc.getAttachment(ExceptionHandler.THROWABLE)))
+				.addExceptionHandler(Throwable.class, Main::exceptionHandler);
 
 		// wrap http handlers with logger (ex. GET /account)
 		handler = HttpUtils.loggerHandler(handler);
@@ -57,12 +63,16 @@ public class Main {
 	}
 
 	private static void notFoundHandler(HttpServerExchange exc) {
-		HttpUtils.sendJson(exc, 404, "resource not found");
+		HttpUtils.sendJson(exc, 404, "not found");
+	}
+
+	private static void methodNotAllowedHandler(HttpServerExchange exc) {
+		HttpUtils.sendJson(exc, 405, "method not allowed");
 	}
 
 	private static void exceptionHandler(HttpServerExchange exc) {
 		var ex = exc.getAttachment(ExceptionHandler.THROWABLE);
 		ex.printStackTrace();
-		HttpUtils.sendJson(exc, 500, "Internal server error");
+		HttpUtils.sendJson(exc, 500, "internal server error");
 	}
 }

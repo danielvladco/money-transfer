@@ -68,11 +68,20 @@ public class TransactionRepositoryInMemoryTest {
 			Assert.fail("must return not found exception");
 		} catch (TransactionNotFoundException ignored) {
 		}
+		try {
+			transactionRepository.get(null);
+
+			Assert.fail("must return not found exception");
+		} catch (TransactionNotFoundException ignored) {
+		}
 
 		var transactions = transactionRepository.getAll();
 		Assert.assertEquals(2, transactions.size());
 
 		transactions = transactionRepository.getByAccountId("fake-account-id1");
 		Assert.assertEquals(2, transactions.size());
+
+		transactions = transactionRepository.getByAccountId(null);
+		Assert.assertEquals(0, transactions.size());
 	}
 }

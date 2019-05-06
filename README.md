@@ -6,7 +6,7 @@ Java 11
 ### REST API
 
 Endpoints:
-- `POST /account` create an account.
+- `POST /v1/account` create an account.
 
     Body request example: 
     ```json 
@@ -20,7 +20,7 @@ Endpoints:
         "success": true
     }
     ```
-- `GET /account` get all accounts
+- `GET /v1/account` get all accounts
 
     Body response example:
     ```json 
@@ -32,7 +32,7 @@ Endpoints:
         "success": true
     }
     ``` 
-- `GET /account/{accountId}` get account
+- `GET /v1/account/{accountId}` get account
      
      Body response example:
      ```json 
@@ -41,7 +41,7 @@ Endpoints:
          "success": true
      }
      ```
-- `GET /account/{accountId}/balance` get account balance
+- `GET /v1/account/{accountId}/balance` get account balance
 
      Body response example:
      ```json 
@@ -50,7 +50,7 @@ Endpoints:
          "success": true
      }
      ``` 
-- `GET /account/{accountId}/transactions` account transactions
+- `GET /v1/account/{accountId}/transactions` account transactions
 
      Body response example:
      ```json 
@@ -62,7 +62,7 @@ Endpoints:
          "success": true
      }
      ```
-- `GET /transaction` get all transactions
+- `GET /v1/transaction` get all transactions
 
      Body response example:
      ```json 
@@ -74,7 +74,7 @@ Endpoints:
          "success": true
      }
      ```
-- `GET /transaction/{transactionId}` get transaction
+- `GET /v1/transaction/{transactionId}` get transaction
 
      Body response example:
      ```json 
@@ -83,7 +83,7 @@ Endpoints:
          "success": true
      }
      ```
-- `POST /transfer` transfers money between accounts
+- `POST /v1/transfer` transfers money between accounts
 
     Body request example: 
     ```json 
@@ -123,3 +123,4 @@ Error codes:
 - `transaction_not_found`
 - `account_invalid`
 - `account_not_found`
+- `transfer_to_oneself`

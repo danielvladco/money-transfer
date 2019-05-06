@@ -9,6 +9,7 @@ import com.danielvladco.money.transfer.transaction.exceptions.TransactionInvalid
 import com.danielvladco.money.transfer.transaction.models.Transaction;
 import com.danielvladco.money.transfer.transfer.exceptions.InsufficientFundsException;
 import com.danielvladco.money.transfer.transfer.exceptions.MismatchingCurrenciesException;
+import com.danielvladco.money.transfer.transfer.exceptions.TransferToOneselfException;
 import com.danielvladco.money.transfer.transfer.models.TransferMoneyRequest;
 import org.junit.Assert;
 import org.junit.Test;
@@ -109,9 +110,24 @@ public class TransferServiceImplTest {
 		} catch (Exception e) {
 			Assert.fail("transaction must fail with AccountNotFoundException");
 		}
+		try {
+			doMoneyTransfer(true,
+					accountId -> new Account(accountId, Currency.getInstance("EUR")),
+					accountId -> new Account(accountId, Currency.getInstance("EUR")),
+					new TransferMoneyRequest(
+							"source-account-id1",
+							"source-account-id1",
+							1000
+					));
+
+			Assert.fail("transaction must fail with TransferToOneselfException");
+		} catch (TransferToOneselfException ignored) {
+		} catch (Exception e) {
+			Assert.fail("transaction must fail with TransferToOneselfException");
+		}
 	}
 
-	void doMoneyTransfer(boolean hasFunds, AccountFactory targetFactory, AccountFactory sourceFactory, TransferMoneyRequest request) throws AccountNotFoundException, MismatchingCurrenciesException, TransactionInvalidException, InsufficientFundsException {
+	void doMoneyTransfer(boolean hasFunds, AccountFactory targetFactory, AccountFactory sourceFactory, TransferMoneyRequest request) throws AccountNotFoundException, MismatchingCurrenciesException, TransactionInvalidException, InsufficientFundsException, TransferToOneselfException {
 		AtomicReference<Account> sourceAccount = new AtomicReference<>();
 		AtomicReference<Account> targetAccount = new AtomicReference<>();
 		accountService.hasFundsFn = (accountId, amount) -> {

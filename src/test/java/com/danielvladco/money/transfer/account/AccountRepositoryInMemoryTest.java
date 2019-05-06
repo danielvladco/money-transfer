@@ -58,6 +58,13 @@ public class AccountRepositoryInMemoryTest {
 		} catch (AccountNotFoundException ignored) {
 		}
 
+		try {
+			accountRepository.get(null);
+
+			Assert.fail("must return not found exception");
+		} catch (AccountNotFoundException ignored) {
+		}
+
 		var accounts = accountRepository.getAll();
 		Assert.assertEquals(2, accounts.size());
 	}

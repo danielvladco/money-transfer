@@ -96,7 +96,7 @@ public class TransactionHttpHandlerTest {
 
 		Assert.assertEquals(400, res.code());
 		assert res.body() != null;
-		Assert.assertEquals("{\"data\":{\"message\":\"transaction not found\",\"code\":\"transaction_not_found\"},\"success\":false}", res.body().string());
+		Assert.assertEquals("{\"data\":{\"code\":\"transaction_not_found\",\"message\":\"transaction not found\"},\"success\":false}", res.body().string());
 	}
 
 	@AfterClass

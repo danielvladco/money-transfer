@@ -140,7 +140,7 @@ public class AccountHttpHandlerTest {
 
 		Assert.assertEquals(res.code(), 400);
 		assert res.body() != null;
-		Assert.assertEquals("{\"data\":{\"message\":\"account not found\",\"code\":\"account_not_found\"},\"success\":false}", res.body().string());
+		Assert.assertEquals("{\"data\":{\"code\":\"account_not_found\",\"message\":\"account not found\"},\"success\":false}", res.body().string());
 	}
 
 	private Response httpPost(String urlPath, String jsonBody) throws IOException {

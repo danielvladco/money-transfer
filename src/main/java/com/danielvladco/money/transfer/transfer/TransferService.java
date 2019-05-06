@@ -4,6 +4,7 @@ import com.danielvladco.money.transfer.account.exceptions.AccountNotFoundExcepti
 import com.danielvladco.money.transfer.transaction.exceptions.TransactionInvalidException;
 import com.danielvladco.money.transfer.transfer.exceptions.InsufficientFundsException;
 import com.danielvladco.money.transfer.transfer.exceptions.MismatchingCurrenciesException;
+import com.danielvladco.money.transfer.transfer.exceptions.TransferToOneselfException;
 import com.danielvladco.money.transfer.transfer.models.TransferMoneyRequest;
 
 public interface TransferService {
@@ -20,5 +21,5 @@ public interface TransferService {
 	void transferMoney(TransferMoneyRequest request) throws AccountNotFoundException,
 			InsufficientFundsException,
 			TransactionInvalidException,
-			MismatchingCurrenciesException;
+			MismatchingCurrenciesException, TransferToOneselfException;
 }

@@ -33,6 +33,9 @@ public class AccountRepositoryInMemory implements AccountRepository {
 
 	@Override
 	public Account get(String accountId) throws AccountNotFoundException {
+		if (accountId == null) {
+			throw new AccountNotFoundException();
+		}
 		if (!accounts.containsKey(accountId)) {
 			throw new AccountNotFoundException();
 		}

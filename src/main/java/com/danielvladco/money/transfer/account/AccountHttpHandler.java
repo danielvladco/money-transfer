@@ -27,16 +27,14 @@ public class AccountHttpHandler {
 		this.transactionRepository = transactionRepository;
 	}
 
-	public HttpHandler makeHandler() {
+	public RoutingHandler makeHandler() {
 		var router = new RoutingHandler();
-		router.post("/account", this::create);
-		router.get("/account", this::getAll);
-		router.get("/account/{accountId}", this::get);
-		router.get("/account/{accountId}/balance", this::getBalance);
-		router.get("/account/{accountId}/transactions", this::accountTransactions);
-		return Handlers.exceptionHandler(router)
-				.addExceptionHandler(AccountInvalidException.class, this.handleException("account_invalid"))
-				.addExceptionHandler(AccountNotFoundException.class, this.handleException("account_not_found"));
+		router.post("/account", exceptionHandlers(this::create));
+		router.get("/account", exceptionHandlers(this::getAll));
+		router.get("/account/{accountId}", exceptionHandlers(this::get));
+		router.get("/account/{accountId}/balance", exceptionHandlers(this::getBalance));
+		router.get("/account/{accountId}/transactions", exceptionHandlers(this::accountTransactions));
+		return router;
 
 	}
 
@@ -64,6 +62,12 @@ public class AccountHttpHandler {
 	private void accountTransactions(HttpServerExchange exchange) {
 		var balance = transactionRepository.getByAccountId(HttpUtils.pathParam(exchange, "accountId"));
 		HttpUtils.sendJson(exchange, 200, balance);
+	}
+
+	private HttpHandler exceptionHandlers(HttpHandler next) {
+		return Handlers.exceptionHandler(next)
+				.addExceptionHandler(AccountInvalidException.class, handleException("account_invalid"))
+				.addExceptionHandler(AccountNotFoundException.class, handleException("account_not_found"));
 	}
 
 	private HttpHandler handleException(String code) {

@@ -81,7 +81,7 @@ public class TransferHttpHandlerTest {
 
 		Assert.assertEquals(400, res.code());
 		assert res.body() != null;
-		Assert.assertEquals("{\"data\":{\"message\":\"mismatching currencies, wanted: USD received: EUR\",\"code\":\"mismatching_currencies\"},\"success\":false}", res.body().string());
+		Assert.assertEquals("{\"data\":{\"code\":\"mismatching_currencies\",\"message\":\"mismatching currencies, wanted: USD received: EUR\"},\"success\":false}", res.body().string());
 	}
 
 	@AfterClass

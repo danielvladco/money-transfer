@@ -19,13 +19,11 @@ public class TransactionHttpHandler {
 		this.transactionRepository = transactionRepository;
 	}
 
-	public HttpHandler makeHandler() {
+	public RoutingHandler makeHandler() {
 		var router = new RoutingHandler();
-		router.get("/transaction", this::getAll);
-		router.get("/transaction/{transactionId}", this::get);
-		return Handlers.exceptionHandler(router)
-				.addExceptionHandler(TransactionInvalidException.class, this.handleException("transaction_invalid"))
-				.addExceptionHandler(TransactionNotFoundException.class, this.handleException("transaction_not_found"));
+		router.get("/transaction", exceptionHandlers(this::getAll));
+		router.get("/transaction/{transactionId}", exceptionHandlers(this::get));
+		return router;
 
 	}
 
@@ -37,6 +35,12 @@ public class TransactionHttpHandler {
 	private void getAll(HttpServerExchange exchange) {
 		var accounts = transactionRepository.getAll();
 		HttpUtils.sendJson(exchange, 200, accounts);
+	}
+
+	private HttpHandler exceptionHandlers(HttpHandler next) {
+		return Handlers.exceptionHandler(next)
+				.addExceptionHandler(TransactionInvalidException.class, handleException("transaction_invalid"))
+				.addExceptionHandler(TransactionNotFoundException.class, handleException("transaction_not_found"));
 	}
 
 	private HttpHandler handleException(String code) {
