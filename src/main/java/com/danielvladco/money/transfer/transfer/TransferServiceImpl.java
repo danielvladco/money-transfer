@@ -55,18 +55,21 @@ public class TransferServiceImpl implements TransferService {
 			throw new InsufficientFundsException();
 		}
 
-		// debit transaction for source account
-		transactionRepository.create(new Transaction(
-				UUID.randomUUID().toString(),
-				request.getSourceAccountId(),
-				-request.getAmount(),
-				sourceAccount.getCurrency()));
-
-		// credit transaction for target account
-		transactionRepository.create(new Transaction(
-				UUID.randomUUID().toString(),
-				request.getTargetAccountId(),
-				request.getAmount(),
-				targetAccount.getCurrency()));
+		transactionRepository.create(
+				// debit transaction for source account
+				new Transaction(
+						UUID.randomUUID().toString(),
+						request.getSourceAccountId(),
+						-request.getAmount(),
+						sourceAccount.getCurrency()
+				),
+				// credit transaction for target account
+				new Transaction(
+						UUID.randomUUID().toString(),
+						request.getTargetAccountId(),
+						request.getAmount(),
+						targetAccount.getCurrency()
+				)
+		);
 	}
 }

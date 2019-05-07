@@ -6,7 +6,6 @@ import com.danielvladco.money.transfer.mocks.AccountRepositoryMock;
 import com.danielvladco.money.transfer.mocks.AccountServiceMock;
 import com.danielvladco.money.transfer.mocks.TransactionRepositoryMock;
 import com.danielvladco.money.transfer.transaction.exceptions.TransactionInvalidException;
-import com.danielvladco.money.transfer.transaction.models.Transaction;
 import com.danielvladco.money.transfer.transfer.exceptions.InsufficientFundsException;
 import com.danielvladco.money.transfer.transfer.exceptions.MismatchingCurrenciesException;
 import com.danielvladco.money.transfer.transfer.exceptions.TransferToOneselfException;
@@ -16,7 +15,6 @@ import org.junit.Test;
 
 import java.util.Currency;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Function;
 
 public class TransferServiceImplTest {
 	private TransactionRepositoryMock transactionRepository = new TransactionRepositoryMock();
@@ -149,20 +147,20 @@ public class TransferServiceImplTest {
 			return sourceAccount.get();
 		};
 
-		final Function<Transaction, Object> targetTransaction = transaction -> {
-			Assert.assertNotEquals(null, transaction.getId());
-			Assert.assertEquals(request.getTargetAccountId(), transaction.getAccountId());
-			Assert.assertEquals(request.getAmount(), transaction.getAmount());
-			Assert.assertEquals(targetAccount.get().getCurrency(), transaction.getCurrency());
-			return null;
-		};
-		transactionRepository.createFn = transaction -> {
-			Assert.assertNotEquals(null, transaction.getId());
-			Assert.assertEquals(request.getSourceAccountId(), transaction.getAccountId());
-			Assert.assertEquals(request.getAmount() * -1, transaction.getAmount());
-			Assert.assertEquals(sourceAccount.get().getCurrency(), transaction.getCurrency());
-			transactionRepository.createFn = targetTransaction;
-			return null;
+		transactionRepository.createFn = transactions -> {
+			if (transactions.length < 2) {
+				Assert.fail("must receive 2 transactions");
+				return;
+			}
+			Assert.assertNotEquals(null, transactions[0].getId());
+			Assert.assertEquals(request.getSourceAccountId(), transactions[0].getAccountId());
+			Assert.assertEquals(request.getAmount() * -1, transactions[0].getAmount());
+			Assert.assertEquals(sourceAccount.get().getCurrency(), transactions[0].getCurrency());
+
+			Assert.assertNotEquals(null, transactions[1].getId());
+			Assert.assertEquals(request.getTargetAccountId(), transactions[1].getAccountId());
+			Assert.assertEquals(request.getAmount(), transactions[1].getAmount());
+			Assert.assertEquals(targetAccount.get().getCurrency(), transactions[1].getCurrency());
 		};
 		transferService.transferMoney(request);
 	}

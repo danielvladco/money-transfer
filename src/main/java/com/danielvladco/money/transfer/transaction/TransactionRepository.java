@@ -10,9 +10,28 @@ public interface TransactionRepository {
 
 	List<Transaction> getAll();
 
+	/**
+	 * Get a transaction based on transaction id
+	 *
+	 * @param transactionId transaction id
+	 * @return transaction
+	 * @throws TransactionNotFoundException transaction is not found
+	 */
 	Transaction get(String transactionId) throws TransactionNotFoundException;
 
-	void create(Transaction transaction) throws TransactionInvalidException;
+	/**
+	 * Create a list of transactions in one atomic operation.
+	 *
+	 * @param transactions list of transactions
+	 * @throws TransactionInvalidException if at least one transaction is is invalid
+	 */
+	void create(Transaction... transactions) throws TransactionInvalidException;
 
-	List<Transaction> getByAccountId(String accountId) ;
+	/**
+	 * Get a list of transactions based on account id
+	 *
+	 * @param accountId account id
+	 * @return list of transaction
+	 */
+	List<Transaction> getByAccountId(String accountId);
 }

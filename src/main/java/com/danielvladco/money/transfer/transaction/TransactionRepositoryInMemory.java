@@ -32,31 +32,40 @@ public class TransactionRepositoryInMemory implements TransactionRepository {
 	}
 
 	@Override
-	public void create(Transaction transaction) throws TransactionInvalidException {
-		if (transaction == null) {
-			throw new TransactionInvalidException("unable to create null transaction");
+	public void create(Transaction... createTransactions) throws TransactionInvalidException {
+		if (createTransactions == null || createTransactions.length == 0) {
+			throw new TransactionInvalidException("invalid argument, expected: a list of transactions, received: null");
 		}
 
-		if (transaction.getId() == null || transaction.getId().equals("")) {
-			transaction.setId(UUID.randomUUID().toString());
+		for (var transaction : createTransactions) {
+
+			if (transaction == null) {
+				throw new TransactionInvalidException("invalid argument, expected: a transaction, received: null");
+			}
+
+			if (transaction.getId() == null || transaction.getId().equals("")) {
+				transaction.setId(UUID.randomUUID().toString());
+			}
+
+			if (transaction.getAmount() == 0) {
+				throw new TransactionInvalidException("transaction amount must not be 0, transactionId: " + transaction.getId());
+			}
+			if (transaction.getCurrency() == null) {
+				throw new TransactionInvalidException("transaction currency must not be null, transactionId: " + transaction.getId());
+			}
+			if (transaction.getAccountId() == null || transaction.getAccountId().equals("")) {
+				throw new TransactionInvalidException("account id must not be empty, transactionId: " + transaction.getId());
+			}
 		}
 
-		if (transaction.getAmount() == 0) {
-			throw new TransactionInvalidException("transaction amount must not be 0");
-		}
-		if (transaction.getCurrency() == null) {
-			throw new TransactionInvalidException("transaction currency must not be null");
-		}
-		if (transaction.getAccountId() == null || transaction.getAccountId().equals("")) {
-			throw new TransactionInvalidException("account id must not be empty");
+		for (var transaction : createTransactions) {
+			if (transactions.containsKey(transaction.getId())) {
+				continue;
+			}
+
+			transactions.put(transaction.getId(), transaction);
 		}
 
-
-		if (transactions.containsKey(transaction.getId())) {
-			return;
-		}
-
-		transactions.put(transaction.getId(), transaction);
 	}
 
 	@Override

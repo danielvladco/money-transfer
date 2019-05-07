@@ -56,7 +56,7 @@ public class TransactionRepositoryInMemoryTest {
 		}
 
 		try {
-			transactionRepository.create(null);
+			transactionRepository.create(null, null);
 
 			Assert.fail("Must not be able to create null Transaction");
 		} catch (TransactionInvalidException ignored) {
